@@ -1,4 +1,6 @@
 #include "modules/arg_parser.h"
+#include<stdio.h>
+#include <string.h>
 
 int arg_parse(int argc, const char **argv)
 {
@@ -7,7 +9,7 @@ int arg_parse(int argc, const char **argv)
         return 1; //若addr为空
     }
 
-    int len = strlen(*argv1);
+    int len = strlen(*argv);
     char IP1[50][10],cIP[4];
     int i = 0,j=len-1;
     int k, m = 0,n=0,num=0;
@@ -16,10 +18,10 @@ int arg_parse(int argc, const char **argv)
     for (i; i <len-1; i++)
     {
 
-	if (strcmp(*(argv1 + i) ,"--ip") == 0)
+	if (strcmp(*(argv + i) ,"--ip") == 0)
 	{
-		//printf("argv1:%s\n",*(argv1 + i+1));
-		strcpy((char*)IP1 , *(argv1 + i+1))
+		//printf("argv:%s\n",*(argv + i+1));
+		strcpy((char*)IP1 , *(argv + i+1));
 	}
 
     }
