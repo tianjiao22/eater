@@ -2,10 +2,11 @@
 #include<stdio.h>
 #include <string.h>
 #include<stdlib.h>
-char *paddr = nullptr;
-char *pPort = nullptr;
+#define MAX_IP 15;
+char *paddr =NULL;
  int Ipflag =0,Portflag =0;
-int portnum = 0;
+
+int portnum=0;
 int arg_parse(int argc, const char **argv)
 {
 	// TODO
@@ -14,105 +15,108 @@ int arg_parse(int argc, const char **argv)
     }
 
     int len =argc;
-    char IP1[50][10] ;
-    char Port[20][10]  ;
     int i = 0;
 
     printf("len%d:\n",len);
     if (len <2) {
         return 1;
     }
-    for (i; i <len ; i++)
-    {
-	if ( strcmp(*(argv + i) ,"--ip") == 0) {
-		//printf("argv:%s\n",*(argv1 + i+1));
-		strcpy( ( char*)IP1 , *(argv + i+1));
+    for (i; i <len ; i++) {
+	if (  strcmp(*(argv + i) ,"--ip") == 0) {
+		printf("argv:%si=%d\n",*(argv + i+1),i);
+                int  iplen = strlen(argv [i+1]);
+                if (iplen>15) {
+                    iplen = 15;
+                }
+
+                paddr = new char[iplen+1];
+                printf("iplen:%d\n",iplen);
+		memcpy( ( char*)paddr , *(argv + i+1),iplen);
+                paddr[iplen]= '\0';
+                printf("paddr:%s\ni=%d\n",(paddr + i),i);
                 Ipflag = 1;
 	}
-        if (strcmp(*(argv + i) ,"--port") == 0) {
-           // printf("Port:%s\n",*(argv1 + i+1));
-		strcpy((char*)Port , *(argv + i+1));
+       if ( (strcmp(*(argv + i) ,"--port") == 0)  && (i +1 <len)){
+            printf("Port:%s\n",*(argv + i+1));
+                int  portlen = strlen(argv [i+1]);
+                char Port[portlen] = {"0"};
+                portnum = atoi(argv [i+1]);
                 Portflag = 1;
-                portnum = atoi(*Port);
         }
-
     }
-
-    if (!IP1 ) {
+    if (!Ipflag) {
         return 1;
     }
-
-    paddr = (char *)*IP1;
-    pPort = (char *)*Port;
-    return 0;
+	return 0;
 }
 
 
 int get_ip(uint32_t &addr) {
 	// TODO
    int n=0,num=0,i=0;
-   char *p = paddr;
    char cIP[4];
    int sumbuf[20] = {0};
    uint32_t ip;
     if (!paddr) {
         return 1;
     }
-    while (*p!= '\0')
-    {
-
-        if (*p == ' ' || *p<'0' || *p>'9') {
+    while (*paddr!= '\0') {
+        if (*paddr == ' ' || *paddr<'0' || *paddr>'9') {
+           // goto END;
             return 1;
         }
-        cIP[n++] = *p; //保存每个子段的第一个字符，用于之后判断该子段是否为0开头
+        cIP[n++] = *paddr; //保存每个子段的第一个字符，用于之后判断该子段是否为0开头
         int sum = 0;  //sum为每一子段的数值，应在0到255之间
 
-        while (*p != '.'&&*p != '\0')
-        {
-          if (*p == ' ' || *p<'0' || *p>'9') {
+        while (*paddr != '.'&&*paddr != '\0') {
+          if (*paddr== ' ' || *paddr<'0' || *paddr>'9') {
+               //goto END;
               return 1;
           }
-          sum = sum * 10 + *p-48;  //每一子段字符串转化为整数
-          p++;
+          sum = sum * 10 + *paddr-48;  //每一子段字符串转化为整数
+          paddr++;
         }
-        if (*p == '.') {
+        printf ("*p:%c\n",*paddr);
+        if (*paddr == '.') {
+            printf("paddr:%c  ~\n",*(paddr+1));
 	/*判断"."前后是否有数字，若无，则为无效IP，如“1.1.127.”  */
-            if ((*(p - 1) >= '0'&&*(p - 1) <= '9') && (*(p + 1) >= '0'&&*(p + 1) <= '9')) {
+            if ((*(paddr - 1) >= '0'&&*(paddr - 1) <= '9') && (*(paddr + 1) >= '0'&&*(paddr + 1) <= '9')) {
                 num++;  //记录“.”出现的次数，不能大于3
+                printf("num:%d  ~\n",num);
             }
             else {
+                //goto END;
                 return 1;
             }
         };
         /* 若子段的值>255或为0开头的非0子段或“.”的数目>3，则为无效IP  */
         if ((sum > 255) || (sum > 0 && cIP[0] =='0')||num>3) {
+            printf("return 4 \n");
             return 1;
         }
 
-        if (*p != '\0') {
-            p++;
+        if (*paddr != '\0') {
+            paddr++;
         }
         n = 0;
-       sumbuf[i] = sum;
+       sumbuf[i] = sum ;
        i++;
-       // printf ("sum:%d\n",sum);
     }
     if (num != 3) {
+         //goto END;
         return 1;
     }
-    addr = ( sumbuf[0]  << 24)+ ( sumbuf[1]  << 16) + ( sumbuf[2]  << 8) +  ( sumbuf[3]  << 0);
-        //addr =  (uint32_t)*paddr (s1 << 24) + (s2 << 8) + (s3 << 0);
-        //printf("addr:%x\n",addr);
+        addr = ( sumbuf[0]  << 24)+ ( sumbuf[1]  << 16) + ( sumbuf[2]  << 8) +  ( sumbuf[3]  << 0);
+        //END:delete paddr;
 	return 0;
 }
 
 int get_port(uint32_t &port)
 {
 	// TODO
-        char *p = pPort;
         int sum =0;
         if ( Portflag== 0 ) {
-            printf("potr null");
+            printf("potr null\n");
             return 1;
         }
         if (!portnum){
@@ -126,6 +130,6 @@ int get_port(uint32_t &port)
                return 1;
             }
         }
-       //printf("getport%d : ",portnum);
+       printf("getport%d : ",portnum);
 	return 0;
 }
