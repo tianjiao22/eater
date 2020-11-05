@@ -1,49 +1,54 @@
-#include "modules/arg_parser.h"
-#include<stdio.h>
+#include <stdio.h>
 #include <string.h>
-#include<stdlib.h>
-#define MAX_IP 15;
-char *paddr = NULL;
-int Ipflag =0,Portflag =0;
+#include <iostream>
+#include <stdint.h>
+#include <stdlib.h>
 
-unsigned portnum=0;
-int arg_parse(int argc, const char **argv)
-{
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof(*x))
+#define MAX_IP 15
+#define MAX_PORT_LEN 5
+using namespace std;
+char *paddr = NULL;
+int ip_flag = 0,port_flag = 0;
+unsigned port_num = 0;
+
+int arg_parse(int argc, const char **argv) {
 	// TODO
     if (argv == NULL) {
         return 1; //若addr为空
     }
 
-    int len =argc;
+    int len = argc;
     int i = 0;
 
     //printf("len:%d\n",len);
-    if (len <2) {
+    if (len < 2) {
         return 1;
     }
-    for (i; i <len ; i++) {
-	if (  strcmp(*(argv + i) ,"--ip") == 0) {
+    for (i; i < len; i++) {
+	if (strcmp(*(argv + i) , "--ip") == 0) {
 		//printf("argv:%si=%d\n",*(argv + i+1),i);
-                int  iplen = strlen(argv [i+1]);
-                if (iplen>15) {
-                    iplen = 15;
+                int  ip_len = strlen(argv [i+1]);
+                if (ip_len > MAX_IP) {
+                    ip_len = MAX_IP;
                 }
-
-                paddr = new char[iplen+1];
+                paddr = new char [MAX_IP+1];
                 //printf("iplen:%d\n",iplen);
-		memcpy( ( char*)paddr , *(argv + i+1),iplen);
-                paddr[iplen]= '\0';
-                Ipflag = 1;
+		memcpy((char*)paddr , ( char*)argv[i + 1],ip_len);
+                paddr[ip_len] = '\0';
+                ip_flag = 1;
 	}
-       if ( (strcmp(*(argv + i) ,"--port") == 0)  && (i +1 <len)){
+       if ((strcmp(*(argv + i) ,"--port") == 0)  && (i + 1 < len)){
             //printf("Port:%s\n",*(argv + i+1));
-                int  portlen = strlen(argv [i+1]);
-                char Port[portlen] = {"0"};
-                portnum = atoi(argv [i+1]);
-                Portflag = 1;
+                int  port_len = strlen(argv [i + 1]);
+                if ( port_len <= MAX_PORT_LEN ) {
+                    port_num = atoi(argv [i + 1]);
+                }
+                port_flag = 1;
         }
     }
-    if (!Ipflag) {
+
+    if (!ip_flag) {
         return 1;
     }
 
@@ -61,8 +66,8 @@ int get_ip(uint32_t &addr) {
          goto ERR;
     }
 
-    while (*paddr!= '\0') {
-        if (*paddr == ' ' || *paddr<'0' || *paddr>'9') {
+    while (*paddr != '\0') {
+        if (*paddr == ' ' || *paddr < '0' || *paddr > '9') {
              goto ERR;
         }
         cIP[n++] = *paddr; //保存每个子段的第一个字符，用于之后判断该子段是否为0开头
@@ -98,6 +103,7 @@ int get_ip(uint32_t &addr) {
        sumbuf[i] = sum ;
        i++;
     }
+
     if (num != 3) {
         return 1;
     }
@@ -105,6 +111,7 @@ int get_ip(uint32_t &addr) {
         paddr = NULL;
         delete  paddr;
 	return 0;
+
     ERR:{
         paddr = NULL;
         delete  paddr;
@@ -112,25 +119,24 @@ int get_ip(uint32_t &addr) {
     }
 }
 
-int get_port(uint32_t &port)
-{
+int get_port(uint32_t &port) {
 	// TODO
         int sum =0;
-        if ( Portflag== 0 ) {
+        if ( port_flag== 0 ) {
             //printf("potr null\n");
             return 1;
         }
-        if (!portnum){
+        if (!port_num){
             return 1;
         }else {
            // sum = atoi(p);
-            if ((portnum > 1) && (portnum < 65535)) {
-                port =  (uint32_t)portnum;
+            if ((port_num > 1) && (port_num < 65535)) {
+                port =  (uint32_t)port_num;
             }
             else {
                return 1;
             }
         }
-       //printf("getport%d : ",portnum);
+       //printf("getport%d : ",port_num);
 	return 0;
 }
