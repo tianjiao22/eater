@@ -9,7 +9,7 @@
 #define MAX_PORT_LEN 5
 using namespace std;
 char *paddr = NULL;
-int ip_flag = 0,port_flag = 0;
+int ip_flag = 0,port_flag = 0,ip_len = 0;
 unsigned port_num = 0;
 
 int arg_parse(int argc, const char **argv) {
@@ -28,10 +28,7 @@ int arg_parse(int argc, const char **argv) {
     for (i; i < len; i++) {
 	if (strcmp(*(argv + i) , "--ip") == 0) {
 		//printf("argv:%si=%d\n",*(argv + i+1),i);
-                int  ip_len = strlen(argv [i+1]);
-                if (ip_len > MAX_IP) {
-                    ip_len = MAX_IP;
-                }
+                ip_len = strlen(argv [i+1]);
                 paddr = new char [MAX_IP+1];
                 //printf("iplen:%d\n",iplen);
 		memcpy((char*)paddr , ( char*)argv[i + 1],ip_len);
