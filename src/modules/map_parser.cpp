@@ -5,8 +5,15 @@
 #include <iostream>
 using namespace std;
 
-server_data::server_data()
-{
+    struct _server_data {
+            std::vector<int> _positions;
+	    std::vector<int> _scores;
+            int _id;
+	    int _size;
+	    char *_map;
+	};
+server_data::server_data() {
+
 }
 
 server_data::server_data(char *map,
@@ -22,17 +29,22 @@ server_data::server_data(char *map,
 server_data::~server_data()
 {
 	// TODO
+    delete _map;
+
 }
 
-class server_data server_data::clone()
-{
+class server_data server_data::clone() {
 	// TODO
-
-	return server_data();
+    struct   _server_data d1;
+        d1._id = this->_id;
+        d1._size = this->_size;
+        d1._positions = this->_positions;
+        d1._scores = this->_scores;
+        d1._map = this->_map;
+	return server_data(d1._map, d1._size,d1._id,d1._positions,d1._scores) ;
 }
 
-int server_data::get_map_size()
-{
+int server_data::get_map_size() {
 	// TODO
 	return this->_size ;
 }
@@ -54,8 +66,7 @@ char server_data::get(int row, int col) {
 
 }
 
-int server_data::get_score_by_pos(int pos)
-{
+int server_data::get_score_by_pos(int pos) {
 	// TODO
     int score = 0;
     if (_scores .size() < _positions.size() ) {
@@ -71,27 +82,23 @@ int server_data::get_score_by_pos(int pos)
 	return score;
 }
 
-void server_data::get_my_pos(int &row, int &col)
-{
+void server_data::get_my_pos(int &row, int &col) {
 	// TODO
         row = 1;
         col = 0;
 }
 
-int server_data::get_my_score()
-{
+int server_data::get_my_score() {
 	// TODO
 	return 0;
 }
 
-int server_data::move(enum move_operating move_op)
-{
+int server_data::move(enum move_operating move_op) {
 	// TODO
 	return 0;
 }
 
-int server_data::fire()
-{
+int server_data::fire() {
 	// TODO
 	return 0;
 }
