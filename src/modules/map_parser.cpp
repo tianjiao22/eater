@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <iostream>
+
 using namespace std;
 
     struct _server_data {
@@ -84,13 +85,24 @@ int server_data::get_score_by_pos(int pos) {
 
 void server_data::get_my_pos(int &row, int &col) {
 	// TODO
-        row = 1;
-        col = 0;
+    if (_positions [_id] % this->_size != 0) {
+        row = _positions [_id] / this->_size;
+        col = _positions [_id] - (row * this->_size) - 1;
+    }
+    else {
+        col = this->_size -1;
+        row = _positions [_id] / this->_size -1;
+    }
 }
 
 int server_data::get_my_score() {
 	// TODO
-	return 0;
+    if ( _scores.size() == _positions.size() ) {
+        return (int)this ->_scores[_id];
+    }
+    else {
+        return 0;
+    }
 }
 
 int server_data::move(enum move_operating move_op) {
