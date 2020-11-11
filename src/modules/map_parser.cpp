@@ -85,14 +85,10 @@ int server_data::get_score_by_pos(int pos) {
 
 void server_data::get_my_pos(int &row, int &col) {
 	// TODO
-    if (_positions [_id] % this->_size != 0) {
+
         row = _positions [_id] / this->_size;
-        col = _positions [_id] - (row * this->_size) - 1;
-    }
-    else {
-        col = this->_size -1;
-        row = _positions [_id] / this->_size -1;
-    }
+        col = _positions [_id] % this->_size;
+
 }
 
 int server_data::get_my_score() {
@@ -107,6 +103,39 @@ int server_data::get_my_score() {
 
 int server_data::move(enum move_operating move_op) {
 	// TODO
+    char move = ' ';
+    int row , col ;
+    switch (move_op) {
+        case move_op_stay:
+            move = ' ';
+            break;
+
+        case move_op_up:
+            move = 'w';
+            _positions[_id] = _positions[_id] - this->_size;
+            get_my_pos(row,col);
+            break;
+
+        case move_op_down:
+            move = 's';
+            _positions[_id] = _positions[_id] + this->_size;
+            get_my_pos(row,col);
+            break;
+
+        case move_op_left:
+            move = 'a';
+            _positions[_id] = _positions[_id] - 1;
+            get_my_pos(row,col);
+            break;
+
+        case move_op_right:
+            move = 'd';
+           _positions[_id] = _positions[_id] + 1;
+            break;
+
+        default:
+            break;
+    }
 	return 0;
 }
 
